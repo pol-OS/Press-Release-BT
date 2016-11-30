@@ -1,0 +1,1086 @@
+library (rvest)
+
+Renewer <- function(i = 1) {
+    SPD_Renewer()
+    GRUEN_Renewer()
+    CDUCSU_Renewer()
+    LINKE_Renewer()
+    print("Die Archive sind aktualisiert")
+}
+
+SPD_Renewer <- function(i = 1) {
+    SPD_HR()
+    SPD_ER()
+    SPD_SR()
+    SPD_R()
+    print("Ihre SPD-Archive wurden vollständig aktualisiert")
+}
+
+SPD_HR <- function(i = 1) {
+
+    SPD_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press.txt")
+    SPD_Link_List <- SPD_Link_List[1]
+    SPD_Press_Page <- "http://www.spdfraktion.de/presse/pressemitteilungen"
+    sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press_New.txt")
+    sink()
+    SPD_Next_Page <- read_html(SPD_Press_Page)
+    SPD_Next_Page <- html_nodes(x = SPD_Next_Page, css = "li.pager-next.next.last")
+    SPD_Test <- grepl(pattern = "pager-next next last", x = SPD_Next_Page)
+
+    while (SPD_Test == TRUE) {
+        SPD_Press_Link <- read_html(SPD_Press_Page)
+        SPD_Press_Link <- html_nodes(x = SPD_Press_Link, css = ".node-pressemitteilung a")
+        SPD_Press_Link[!grepl(pattern = "http://", x = SPD_Press_Link, fixed = TRUE)]
+        SPD_Press_Link <- html_attr(SPD_Press_Link, "href")
+        SPD_Link <- c("http://www.spdfraktion.de")
+        SPD_Press_Link <- paste(SPD_Link, SPD_Press_Link, sep = "")
+        SPD_Link_Test <- SPD_Link_List %in% SPD_Press_Link
+        SPD_Count <- grep(SPD_Link_List, SPD_Press_Link) - 1
+        if (SPD_Link_Test == TRUE) {
+            break
+        }
+
+        sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press_New.txt", append = TRUE)
+        cat(SPD_Press_Link, sep = "\n")
+        sink()
+        SPD_Next_Page <- read_html(SPD_Press_Page)
+        SPD_Next_Page <- html_nodes(x = SPD_Next_Page, css = "#block-system-main .last a")
+        SPD_Next_Page <- html_attr(SPD_Next_Page, "href")
+        SPD_Next_Page <- SPD_Next_Page[1]
+        SPD_Next_Page <- paste(SPD_Link, SPD_Next_Page, sep = "")
+        as.character(SPD_Next_Page)
+        SPD_Press_Page <- as.character(SPD_Next_Page)
+        SPD_Next_Page <- read_html(SPD_Press_Page)
+        SPD_Next_Page <- html_nodes(x = SPD_Next_Page, css = "li.pager-next.next.last")
+        SPD_Test <- grepl(pattern = "pager-next next last", x = SPD_Next_Page)
+    }
+
+    if (SPD_Count > 0) {
+        SPD_Press_Link <- read_html(SPD_Press_Page)
+        SPD_Press_Link <- html_nodes(x = SPD_Press_Link, css = ".node-pressemitteilung a")
+        SPD_Press_Link[!grepl(pattern = "http://", x = SPD_Press_Link, fixed = TRUE)]
+        SPD_Press_Link <- html_attr(SPD_Press_Link, "href")
+        SPD_Press_Link <- SPD_Press_Link[1:SPD_Count]
+        SPD_Press_Link <- paste(SPD_Link, SPD_Press_Link, sep = "")
+        sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press_New.txt", append = TRUE)
+        cat(SPD_Press_Link, sep = "\n")
+        sink()
+    }
+
+    print("Ihrem Archiv zur Verwaltung der URL-Listen wurde eine Fassung hinzugefügt, die die neuesten SPD-Pressemitteilungen enthält, die nicht in Ihrem Pressemitteilungsarchiv gespeichert sind.")
+}
+
+SPD_ER <- function(i = 1) {
+
+    SPD_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press_New.txt")
+    c <- length(SPD_Link_List)
+    i <- 1
+
+    while (i <= c) {
+        SPD_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press_New.txt")
+        SPD_Link_List <- SPD_Link_List[i]
+        SPD_URL <- sub(pattern = "http://www.spdfraktion.de/presse/pressemitteilungen/", replacement = "", x = SPD_Link_List, fixed = TRUE)
+        SPD_Lokal <- "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/SPD/"
+        SPD_URL <- substr(SPD_URL, 1, 152)
+        Doc_Typ <- ".html"
+        SPD_Lokal <- paste(SPD_Lokal, SPD_URL, Doc_Typ, sep = "")
+        download.file(SPD_Link_List, SPD_Lokal)
+        i <- i + 1
+    }
+
+    print("Ihrem Archiv wurden die neuesten SPD-Pressemitteilungen hinzugefügt")
+}
+
+SPD_SR <- function(i = 1) {
+
+    SPD_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press_New.txt")
+
+    c <- length(SPD_Link_List)
+    i <- 1
+
+    SPD_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press_New.txt")
+    SPD_Link_List <- SPD_Link_List[i]
+    URL <- SPD_Link_List
+
+    SPD_URL <- sub(pattern = "http://www.spdfraktion.de/presse/pressemitteilungen/", replacement = "", x = SPD_Link_List, fixed = TRUE)
+    SPD_URL <- substr(SPD_URL, 1, 152)
+    Doc_Typ <- ".html"
+    SPD_Lokal <- paste(SPD_URL, Doc_Typ, sep = "")
+    Doc <- paste("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/SPD/", SPD_Lokal, sep = "")
+
+    SPD_HTML <- read_html(Doc)
+
+    SPD_Titel <- html_nodes(x = SPD_HTML, css = "h1")
+    Titel <- html_text(SPD_Titel)
+    Titel <- paste(Titel, collapse = ", ")
+    if (Titel == "") {
+        Titel <- NA
+    }
+
+    SPD_Meta1 <- html_nodes(SPD_HTML, "dt")
+    SPD_Meta2 <- html_nodes(SPD_HTML, "dd")
+    Meta1 <- html_text(SPD_Meta1)
+    Meta2 <- html_text(SPD_Meta2)
+    Meta <- paste(Meta1, Meta2)
+
+    Count <- grepl("Abgeordnete/r:", Meta, fixed = TRUE)
+    Count <- match("TRUE", Count)
+    Rep <- Meta[Count]
+    Rep <- paste(Rep, collapse = "")
+    Rep <- gsub("Abgeordnete/r: ", "", Rep, TRUE)
+    x <- grepl("NA", Rep)
+    if (x == TRUE) {
+        Rep <- suppressWarnings(as.integer(Rep))
+        x[is.na(Rep)] <- 0
+        if (x == 0) {
+            Count <- grepl("Abgeordnete:", Meta, fixed = TRUE)
+            Count <- match("TRUE", Count)
+            Rep <- Meta[Count]
+            Rep <- paste(Rep, collapse = "")
+            Rep <- gsub("Abgeordnete: ", "", Rep, TRUE)
+            x <- grepl("NA", Rep)
+            if (x == TRUE) {
+                Rep <- suppressWarnings(as.integer(Rep))
+                x[is.na(Rep)] <- 0
+                if (x == 0) {
+                    Rep <- html_nodes(x = SPD_HTML, css = "p:nth-child(2)")
+                    Rep <- html_nodes(Rep, "strong")
+                    Rep <- html_text(Rep)
+                    Rep <- paste(Rep, collapse = ", ")
+                    if (Rep == "") {
+                        Rep <- NA
+                    }
+                }
+            }
+        }
+    }
+    Abgeordnete_r <- Rep
+
+    Count <- grepl("Stand:", Meta, fixed = TRUE)
+    Count <- match("TRUE", Count)
+    Date <- Meta[Count]
+    Date <- gsub("Stand: ", "", Date, TRUE)
+    Date <- gsub(".", "-", Date, fixed = TRUE)
+    Date <- as.Date(Date, "%d-%m-%Y")
+    Date <- paste(Date, collapse = ", ")
+    if (Date == "") {
+        Date <- NA
+    }
+    Veröffentlichungsdatum <- Date
+
+    SPD_Content <- html_nodes(x = SPD_HTML, css = "#block-system-main p")
+    Content <- html_text(SPD_Content)
+    Content <- paste(Content, collapse = "")
+    Content <- gsub("\n", "", Content)
+    Content <- gsub("  ", "", Content)
+    Content <- gsub(":", ": ", Content)
+    Content <- gsub("  ", " ", Content)
+    Content <- gsub(pattern = '\"', '', Content)
+    Content <- paste(Content, collapse = ", ")
+    if (Content == "  ") {
+        SPD_Content <- html_nodes(x = SPD_HTML, css = "div.maintext")
+        Content <- html_text(SPD_Content)
+        Content <- paste(Content, collapse = "")
+        Content <- gsub(pattern = '\"', '', Content)
+        Content <- gsub("\n", "", Content)
+        Content <- gsub("  ", "", Content)
+        Content <- gsub(":", ": ", Content)
+        Content <- gsub("  ", " ", Content)
+        Content <- paste(Content, collapse = ", ")
+        if (Content == "") {
+            Content <- NA
+        }
+    }
+    Inhalt <- Content
+
+    Partei <- "SPD"
+
+    SPD_Data_Frame <- data.frame(Partei, Titel, Abgeordnete_r, Veröffentlichungsdatum, Inhalt, URL)
+
+    i <- i + 1
+
+    while (i <= c) {
+
+        SPD_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press_New.txt")
+        SPD_Link_List <- SPD_Link_List[i]
+        URL <- SPD_Link_List
+
+        SPD_URL <- sub(pattern = "http://www.spdfraktion.de/presse/pressemitteilungen/", replacement = "", x = SPD_Link_List, fixed = TRUE)
+        SPD_URL <- substr(SPD_URL, 1, 152)
+        Doc_Typ <- ".html"
+        SPD_Lokal <- paste(SPD_URL, Doc_Typ, sep = "")
+        Doc <- paste("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/SPD/", SPD_Lokal, sep = "")
+
+        SPD_HTML <- read_html(Doc)
+
+        SPD_Titel <- html_nodes(x = SPD_HTML, css = "h1")
+        Titel <- html_text(SPD_Titel)
+        Titel <- paste(Titel, collapse = ", ")
+        if (Titel == "") {
+            Titel <- NA
+        }
+
+        SPD_Meta1 <- html_nodes(SPD_HTML, "dt")
+        SPD_Meta2 <- html_nodes(SPD_HTML, "dd")
+        Meta1 <- html_text(SPD_Meta1)
+        Meta2 <- html_text(SPD_Meta2)
+        Meta <- paste(Meta1, Meta2)
+
+        Count <- grepl("Abgeordnete/r:", Meta, fixed = TRUE)
+        Count <- match("TRUE", Count)
+        Rep <- Meta[Count]
+        Rep <- paste(Rep, collapse = "")
+        Rep <- gsub("Abgeordnete/r: ", "", Rep, TRUE)
+        x <- grepl("NA", Rep)
+        if (x == TRUE) {
+            Rep <- suppressWarnings(as.integer(Rep))
+            x[is.na(Rep)] <- 0
+            if (x == 0) {
+                Count <- grepl("Abgeordnete:", Meta, fixed = TRUE)
+                Count <- match("TRUE", Count)
+                Rep <- Meta[Count]
+                Rep <- paste(Rep, collapse = "")
+                Rep <- gsub("Abgeordnete: ", "", Rep, TRUE)
+                x <- grepl("NA", Rep)
+                if (x == TRUE) {
+                    Rep <- suppressWarnings(as.integer(Rep))
+                    x[is.na(Rep)] <- 0
+                    if (x == 0) {
+                        Rep <- html_nodes(x = SPD_HTML, css = "p:nth-child(2)")
+                        Rep <- html_nodes(Rep, "strong")
+                        Rep <- html_text(Rep)
+                        Rep <- paste(Rep, collapse = ", ")
+                        if (Rep == "") {
+                            Rep <- NA
+                        }
+                    }
+                }
+            }
+        }
+        Abgeordnete_r <- Rep
+
+        Count <- grepl("Stand:", Meta, fixed = TRUE)
+        Count <- match("TRUE", Count)
+        Date <- Meta[Count]
+        Date <- gsub("Stand: ", "", Date, TRUE)
+        Date <- gsub(".", "-", Date, fixed = TRUE)
+        Date <- as.Date(Date, "%d-%m-%Y")
+        Date <- paste(Date, collapse = ", ")
+        if (Date == "") {
+            Date <- NA
+        }
+        Veröffentlichungsdatum <- Date
+
+        SPD_Content <- html_nodes(x = SPD_HTML, css = "#block-system-main p")
+        Content <- html_text(SPD_Content)
+        Content <- paste(Content, collapse = "")
+        Content <- gsub(pattern = '\"', '', Content)
+        Content <- gsub("\n", "", Content)
+        Content <- gsub("  ", "", Content)
+        Content <- gsub(":", ": ", Content)
+        Content <- gsub("  ", " ", Content)
+        Content <- paste(Content, collapse = ", ")
+        if (Content == "  ") {
+            SPD_Content <- html_nodes(x = SPD_HTML, css = "div.maintext")
+            Content <- html_text(SPD_Content)
+            Content <- paste(Content, collapse = "")
+            Content <- gsub(pattern = '\"', '', Content)
+            Content <- gsub("\n", "", Content)
+            Content <- gsub("  ", "", Content)
+            Content <- gsub(":", ": ", Content)
+            Content <- gsub("  ", " ", Content)
+            Content <- paste(Content, collapse = ", ")
+            if (Content == "") {
+                Content <- NA
+            }
+        }
+        Inhalt <- Content
+
+        SPD_New <- data.frame(Partei, Titel, Abgeordnete_r, Veröffentlichungsdatum, Inhalt, URL)
+        SPD_Data_Frame <- rbind(SPD_Data_Frame, SPD_New)
+
+        i <- i + 1
+    }
+    write.table(SPD_Data_Frame, "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/SPD_New.txt", row.names = FALSE, sep = "\t")
+
+    print("Eine Tabelle mit verschiedenen Parametern (Partei, Titel der Pressemitteilung, verfassende Abgeordnete, Veröffentlichungsdatum und Inhalt) wurde in Ihren Archiven abgelegt.")
+}
+
+SPD_R <- function(i = 1) {
+
+    SPD1 <- read.table("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/SPD.txt", header = TRUE)
+    SPD2 <- read.table("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/SPD_New.txt", header = TRUE)
+    SPD <- rbind(SPD2, SPD1)
+    write.table(SPD, "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/SPD.txt", row.names = FALSE, sep = "\t")
+    file.remove("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/SPD_New.txt")
+    SPD_List1 <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press.txt")
+    SPD_List2 <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press_New.txt")
+    SPD_List <- append(SPD_List2, SPD_List1)
+    sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press.txt")
+    cat(SPD_List, sep = "\n")
+    sink()
+    file.remove("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press_New.txt")
+    print("Ihre SPD-Archive wurden aktualisiert")
+}
+
+
+LINKE_Renewer <- function(i = 1) {
+    LINKE_HR()
+    LINKE_ER()
+    LINKE_SR()
+    LINKE_R()
+    print("Ihre Die Linke-Archive wurden vollständig aktualisiert")
+}
+
+LINKE_HR <- function(i = 1) {
+
+    LINKE_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press.txt")
+    LINKE_Link_List <- LINKE_Link_List[1]
+    LINKE_Press_Page <- "https://www.linksfraktion.de/presse/pressemitteilungen/?tx_news_pi1%5B%40widget_0%5D%5BcurrentPage%5D=1&cHash=193b7770118723ac6942c5c3c7b492e1"
+    LINKE_Page <- 1
+    sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press_New.txt")
+    sink()
+    LINKE_Next_Page <- read_html(LINKE_Press_Page)
+    LINKE_Next_Page <- html_nodes(x = LINKE_Next_Page, css = "li.last.next")
+    LINKE_Test <- grepl(pattern = "last next", x = LINKE_Next_Page)
+
+    while (LINKE_Test == TRUE) {
+        LINKE_Press_Link <- read_html(LINKE_Press_Page)
+        LINKE_Press_Link <- html_nodes(x = LINKE_Press_Link, css = ".more")
+        LINKE_Press_Link[!grepl(pattern = "http://", x = LINKE_Press_Link, fixed = TRUE)]
+        LINKE_Press_Link <- html_attr(LINKE_Press_Link, "href")
+        LINKE_Link <- c("https://www.linksfraktion.de")
+        as.data.frame(LINKE_Link)
+        LINKE_Press_Link <- paste(LINKE_Link, LINKE_Press_Link, sep = "")
+        LINKE_Link_Test <- LINKE_Link_List %in% LINKE_Press_Link
+        LINKE_Count <- grep(LINKE_Link_List, LINKE_Press_Link) - 1
+        if (LINKE_Link_Test == TRUE) {
+            break
+        }
+
+        sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press_New.txt", append = TRUE)
+        cat(LINKE_Press_Link, sep = "\n")
+        sink()
+        LINKE_Page <- LINKE_Page + 1
+        LINKE_Next_Page_first <- "https://www.linksfraktion.de/presse/pressemitteilungen/?tx_news_pi1%5B%40widget_0%5D%5BcurrentPage%5D="
+        LINKE_Next_Page_last <- "&cHash=193b7770118723ac6942c5c3c7b492e1"
+        LINKE_Next_Page <- paste(LINKE_Next_Page_first, LINKE_Page, LINKE_Next_Page_last, sep = "")
+        as.character(LINKE_Next_Page)
+        LINKE_Press_Page <- as.character(LINKE_Next_Page)
+        LINKE_Next_Page <- read_html(LINKE_Press_Page)
+        LINKE_Next_Page <- html_nodes(x = LINKE_Next_Page, css = "li.last.next")
+        LINKE_Test <- grepl(pattern = "last next", x = LINKE_Next_Page)
+    }
+
+    if (LINKE_Count > 0) {
+        LINKE_Press_Link <- read_html(LINKE_Press_Page)
+        LINKE_Press_Link <- html_nodes(x = LINKE_Press_Link, css = ".more")
+        LINKE_Press_Link[!grepl(pattern = "http://", x = LINKE_Press_Link, fixed = TRUE)]
+        LINKE_Press_Link <- html_attr(LINKE_Press_Link, "href")
+        LINKE_Press_Link <- LINKE_Press_Link[1:LINKE_Count]
+        LINKE_Press_Link <- paste(LINKE_Link, LINKE_Press_Link, sep = "")
+        sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press_New.txt", append = TRUE)
+        cat(LINKE_Press_Link, sep = "\n")
+        sink()
+    }
+
+    print("Ihrem Archiv zur Verwaltung der URL-Listen wurde eine Fassung hinzugefügt, die die neuesten Die Linken-Pressemitteilungen enthält, die nicht in Ihrem Pressemitteilungsarchiv gespeichert sind.")
+}
+
+LINKE_ER <- function(i = 1) {
+
+    LINKE_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press_New.txt")
+    c <- length(LINKE_Link_List)
+    i <- 1
+
+    while (i <= c) {
+        LINKE_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press_New.txt")
+        LINKE_Link_List <- LINKE_Link_List[i]
+        LINKE_URL <- sub(pattern = "https://www.linksfraktion.de/presse/pressemitteilungen/", replacement = "", x = LINKE_Link_List, fixed = TRUE)
+        LINKE_URL <- gsub(pattern = "/", replacement = "", x = LINKE_URL, fixed = TRUE)
+        LINKE_URL <- gsub(pattern = "detail", replacement = "", x = LINKE_URL, fixed = TRUE)
+        LINKE_Lokal <- "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Die Linke/"
+        LINKE_URL <- substr(LINKE_URL, 1, 152)
+        Doc_Typ <- ".html"
+        LINKE_Lokal <- paste(LINKE_Lokal, LINKE_URL, Doc_Typ, sep = "")
+        download.file(LINKE_Link_List, LINKE_Lokal)
+        i <- i + 1
+    }
+
+    print("Ihrem Archiv wurden die neuesten Die Linke-Pressemitteilungen hinzugefügt")
+
+}
+
+LINKE_SR <- function(i = 1) {
+
+    LINKE_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press_New.txt")
+
+    c <- length(LINKE_Link_List)
+    i <- 1
+
+    LINKE_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press_New.txt")
+    LINKE_Link_List <- LINKE_Link_List[i]
+    URL <- LINKE_Link_List
+
+    LINKE_URL <- sub(pattern = "https://www.linksfraktion.de/presse/pressemitteilungen/", replacement = "", x = LINKE_Link_List, fixed = TRUE)
+    LINKE_URL <- gsub(pattern = "/", replacement = "", x = LINKE_URL, fixed = TRUE)
+    LINKE_URL <- gsub(pattern = "detail", replacement = "", x = LINKE_URL, fixed = TRUE)
+    LINKE_URL <- substr(LINKE_URL, 1, 152)
+    Doc_Typ <- ".html"
+    LINKE_Lokal <- paste(LINKE_URL, Doc_Typ, sep = "")
+    Doc <- paste("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Die Linke/", LINKE_Lokal, sep = "")
+
+    LINKE_HTML <- read_html(Doc)
+
+    LINKE_Titel <- html_nodes(x = LINKE_HTML, css = "h1")
+    Titel <- html_text(LINKE_Titel)
+    Titel <- gsub(pattern = '\"', '', Titel)
+    Titel <- paste(Titel, collapse = "")
+    if (Titel == "") {
+        Titel <- NA
+    }
+
+    LINKE_Rep <- html_nodes(x = LINKE_HTML, css = "#c175 span:nth-child(1)")
+    LINKE_Rep <- html_text(LINKE_Rep)
+    LINKE_Rep <- gsub(pattern = "\r\n", replacement = "", x = LINKE_Rep, fixed = TRUE)
+    LINKE_Rep <- gsub(pattern = "  ", replacement = "", x = LINKE_Rep, fixed = TRUE)
+    LINKE_Rep <- gsub(pattern = ",", replacement = "", x = LINKE_Rep, fixed = TRUE)
+    LINKE_Rep <- gsub("\r", "", LINKE_Rep)
+    Rep <- gsub(pattern = "Pressemitteilung von ", replacement = "", x = LINKE_Rep, fixed = TRUE)
+    Rep <- paste(Rep, collapse = "")
+    if (Rep == "") {
+        Rep <- NA
+    }
+    Abgeordnete_r <- Rep
+
+    LINKE_Date <- html_nodes(x = LINKE_HTML, css = "time")
+    LINKE_Date <- html_attr(LINKE_Date, "datetime")
+    Date <- as.Date(LINKE_Date, "%Y-%m-%d")
+    Date <- paste(Date, collapse = "")
+    if (Date == "") {
+        Date <- NA
+    }
+    Veröffentlichungsdatum <- Date
+
+    LINKE_Content <- html_nodes(x = LINKE_HTML, css = "div.news-text-wrap")
+    LINKE_Content <- html_text(LINKE_Content)
+    LINKE_Content <- paste(LINKE_Content, collapse = "")
+    LINKE_Content <- gsub(pattern = "\r", replacement = "", x = LINKE_Content, fixed = TRUE)
+    LINKE_Content <- gsub(pattern = "\n", replacement = "", x = LINKE_Content, fixed = TRUE)
+    LINKE_Content <- gsub(pattern = "\t", replacement = "", x = LINKE_Content, fixed = TRUE)
+    Content <- gsub(pattern = "  ", replacement = "", x = LINKE_Content, fixed = TRUE)
+    Content <- gsub(pattern = ":", replacement = ": ", x = Content, fixed = TRUE)
+    Content <- gsub(pattern = "  ", replacement = " ", x = Content, fixed = TRUE)
+    Content <- gsub(pattern = '\"', '', Content)
+    Content <- gsub("/", " ", Content)
+    Content <- paste(Content, collapse = "")
+    if (Content == "") {
+        Content <- NA
+    }
+    Inhalt <- Content
+
+    Partei <- "Die Linke"
+
+    LINKE_Data_Frame <- data.frame(Partei, Titel, Abgeordnete_r, Veröffentlichungsdatum, Inhalt, URL)
+
+    i <- i + 1
+
+    while (i <= c) {
+
+        LINKE_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press_New.txt")
+        LINKE_Link_List <- LINKE_Link_List[i]
+        URL <- LINKE_Link_List
+
+        LINKE_URL <- sub(pattern = "https://www.linksfraktion.de/presse/pressemitteilungen/", replacement = "", x = LINKE_Link_List, fixed = TRUE)
+        LINKE_URL <- gsub(pattern = "/", replacement = "", x = LINKE_URL, fixed = TRUE)
+        LINKE_URL <- gsub(pattern = "detail", replacement = "", x = LINKE_URL, fixed = TRUE)
+        LINKE_URL <- substr(LINKE_URL, 1, 152)
+        Doc_Typ <- ".html"
+        LINKE_Lokal <- paste(LINKE_URL, Doc_Typ, sep = "")
+        Doc <- paste("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Die Linke/", LINKE_Lokal, sep = "")
+
+        LINKE_HTML <- read_html(Doc)
+
+        LINKE_Titel <- html_nodes(x = LINKE_HTML, css = "h1")
+        Titel <- html_text(LINKE_Titel)
+        Titel <- gsub(pattern = '\"', '', Titel)
+        Titel <- paste(Titel, collapse = "")
+        if (Titel == "") {
+            Titel <- NA
+        }
+
+        LINKE_Rep <- html_nodes(x = LINKE_HTML, css = "#c175 span:nth-child(1)")
+        LINKE_Rep <- html_text(LINKE_Rep)
+        LINKE_Rep <- gsub(pattern = "\r\n", replacement = "", x = LINKE_Rep, fixed = TRUE)
+        LINKE_Rep <- gsub(pattern = "  ", replacement = "", x = LINKE_Rep, fixed = TRUE)
+        LINKE_Rep <- gsub(pattern = ",", replacement = "", x = LINKE_Rep, fixed = TRUE)
+        LINKE_Rep <- gsub("\r", "", LINKE_Rep)
+        Rep <- gsub(pattern = "Pressemitteilung von ", replacement = "", x = LINKE_Rep, fixed = TRUE)
+        Rep <- paste(Rep, collapse = "")
+        if (Rep == "") {
+            Rep <- NA
+        }
+        Abgeordnete_r <- Rep
+
+        LINKE_Date <- html_nodes(x = LINKE_HTML, css = "time")
+        LINKE_Date <- html_attr(LINKE_Date, "datetime")
+        Date <- as.Date(LINKE_Date, "%Y-%m-%d")
+        Date <- paste(Date, collapse = "")
+        if (Date == "") {
+            Date <- NA
+        }
+        Veröffentlichungsdatum <- Date
+
+        LINKE_Content <- html_nodes(x = LINKE_HTML, css = "div.news-text-wrap")
+        LINKE_Content <- html_text(LINKE_Content)
+        LINKE_Content <- paste(LINKE_Content, collapse = "")
+        LINKE_Content <- gsub(pattern = "\r", replacement = "", x = LINKE_Content, fixed = TRUE)
+        LINKE_Content <- gsub(pattern = "\n", replacement = "", x = LINKE_Content, fixed = TRUE)
+        LINKE_Content <- gsub(pattern = "\t", replacement = "", x = LINKE_Content, fixed = TRUE)
+        Content <- gsub(pattern = "  ", replacement = "", x = LINKE_Content, fixed = TRUE)
+        Content <- gsub(pattern = ":", replacement = ": ", x = Content, fixed = TRUE)
+        Content <- gsub(pattern = "  ", replacement = " ", x = Content, fixed = TRUE)
+        Content <- gsub(pattern = '\"', '', Content)
+        Content <- gsub("/", " ", Content)
+        Content <- paste(Content, collapse = "")
+        if (Content == "") {
+            Content <- NA
+        }
+        Inhalt <- Content
+
+        LINKE_New <- data.frame(Partei, Titel, Abgeordnete_r, Veröffentlichungsdatum, Inhalt, URL)
+        LINKE_Data_Frame <- rbind(LINKE_Data_Frame, LINKE_New)
+
+        i <- i + 1
+    }
+
+    write.table(LINKE_Data_Frame, "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/Die Linke_New.txt", row.names = FALSE, sep = "\t")
+    print("Eine Tabelle mit verschiedenen Parametern (Partei, Titel der Pressemitteilung, verfassende Abgeordnete, Veröffentlichungsdatum und Inhalt) wurde in Ihren Archiven abgelegt.")
+}
+
+LINKE_R <- function(i = 1) {
+
+    Die_Linke1 <- read.table("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/Die Linke.txt", header = TRUE)
+    Die_Linke2 <- read.table("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/Die Linke_New.txt", header = TRUE)
+    Die_Linke <- rbind(Die_Linke2, Die_Linke1)
+    write.table(Die_Linke, "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/Die Linke.txt", row.names = FALSE, sep = "\t")
+    file.remove("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/Die Linke_New.txt")
+    LINKE_List1 <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press.txt")
+    LINKE_List2 <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press_New.txt")
+    LINKE_List <- append(LINKE_List2, LINKE_List1)
+    sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press.txt")
+    cat(LINKE_List, sep = "\n")
+    sink()
+    file.remove("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press_New.txt")
+    print("Ihre Die Linke-Archive wurden aktualisiert")
+}
+
+
+
+CDUCSU_Renewer <- function(i = 1) {
+    CDUCSU_HR()
+    CDUCSU_ER()
+    CDUCSU_SR()
+    CDUCSU_R()
+    print("Ihre CDU/CSU-Archive wurden vollständig aktualisiert")
+}
+
+CDUCSU_HR <- function(i = 1) {
+
+    CDUCSU_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press.txt")
+    CDUCSU_Link_List <- CDUCSU_Link_List[1]
+    CDUCSU_Press_Page <- "https://www.cducsu.de/presse/pressemitteilungen?title=&term_node_tid_depth_1=All&term_node_tid_depth_2=All&field_datum_value[min]&field_datum_value[max]&term_node_tid_depth_3=157&page=0"
+    CDUCSU_Page <- 0
+    sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press_New.txt")
+    sink()
+    CDUCSU_Next_Page <- read_html(CDUCSU_Press_Page)
+    CDUCSU_Next_Page <- html_nodes(x = CDUCSU_Next_Page, css = "li.pager-next.first.last")
+    CDUCSU_Test <- grepl(pattern = "pager-next first last", x = CDUCSU_Next_Page)
+
+    while (CDUCSU_Test == TRUE) {
+        CDUCSU_Press_Link <- read_html(CDUCSU_Press_Page)
+        CDUCSU_Press_Link <- html_nodes(x = CDUCSU_Press_Link, css = "#view-display-id-page_5 h2 a")
+        CDUCSU_Press_Link[!grepl(pattern = "http://", x = CDUCSU_Press_Link, fixed = TRUE)]
+        CDUCSU_Press_Link <- html_attr(CDUCSU_Press_Link, "href")
+        CDUCSU_Link <- c("https://www.cducsu.de")
+        as.data.frame(CDUCSU_Link)
+        CDUCSU_Press_Link <- paste(CDUCSU_Link, CDUCSU_Press_Link, sep = "")
+        CDUCSU_Link_Test <- CDUCSU_Link_List %in% CDUCSU_Press_Link
+        CDUCSU_Count <- grep(CDUCSU_Link_List, CDUCSU_Press_Link) - 1
+        if (CDUCSU_Link_Test == TRUE) {
+            break
+        }
+
+        sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press_New.txt", append = TRUE)
+        cat(CDUCSU_Press_Link, sep = "\n")
+        sink()
+        CDUCSU_Page <- CDUCSU_Page + 1
+        CDUCSU_Next_Page_first <- "https://www.cducsu.de/presse/pressemitteilungen?title=&term_node_tid_depth_1=All&term_node_tid_depth_2=All&field_datum_value[min]&field_datum_value[max]&term_node_tid_depth_3=157&page="
+        CDUCSU_Next_Page <- paste(CDUCSU_Next_Page_first, CDUCSU_Page, sep = "")
+        as.character(CDUCSU_Next_Page)
+        CDUCSU_Press_Page <- as.character(CDUCSU_Next_Page)
+        CDUCSU_Next_Page <- read_html(CDUCSU_Press_Page)
+        CDUCSU_Next_Page <- html_nodes(x = CDUCSU_Next_Page, css = "li.pager-next.first.last")
+        CDUCSU_Test <- grepl(pattern = "href", x = CDUCSU_Next_Page)
+    }
+
+    if (CDUCSU_Count > 0) {
+        CDUCSU_Press_Link <- read_html(CDUCSU_Press_Page)
+        CDUCSU_Press_Link <- html_nodes(x = CDUCSU_Press_Link, css = "#view-display-id-page_5 h2 a")
+        CDUCSU_Press_Link[!grepl(pattern = "http://", x = CDUCSU_Press_Link, fixed = TRUE)]
+        CDUCSU_Press_Link <- html_attr(CDUCSU_Press_Link, "href")
+        CDUCSU_Press_Link <- CDUCSU_Press_Link[1:CDUCSU_Count]
+        CDUCSU_Link <- c("https://www.cducsu.de")
+        CDUCSU_Press_Link <- paste(CDUCSU_Link, CDUCSU_Press_Link, sep = "")
+        sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press_New.txt", append = TRUE)
+        cat(CDUCSU_Press_Link, sep = "\n")
+        sink()
+    }
+
+    print("Ihrem Archiv zur Verwaltung der URL-Listen wurde eine Fassung hinzugefügt, die die neuesten CDU/CSU-Pressemitteilungen enthält, die nicht in Ihrem Pressemitteilungsarchiv gespeichert sind.")
+}
+
+CDUCSU_ER <- function(i = 1) {
+
+    CDUCSU_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press_New.txt")
+    c <- length(CDUCSU_Link_List)
+    i <- 1
+
+    while (i <= c) {
+        CDUCSU_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press_New.txt")
+        CDUCSU_Link_List <- CDUCSU_Link_List[i]
+        CDUCSU_URL <- sub(pattern = "https://www.cducsu.de/presse/pressemitteilungen/", replacement = "", x = CDUCSU_Link_List, fixed = TRUE)
+        CDUCSU_Lokal <- "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/CDU-CSU/"
+        CDUCSU_URL <- substr(CDUCSU_URL, 1, 152)
+        Doc_Typ <- ".html"
+        CDUCSU_Lokal <- paste(CDUCSU_Lokal, CDUCSU_URL, Doc_Typ, sep = "")
+        download.file(CDUCSU_Link_List, CDUCSU_Lokal)
+        i <- i + 1
+    }
+
+    print("Ihrem Archiv wurden die neuesten CDU/CSU-Pressemitteilungen hinzugefügt")
+}
+
+CDUCSU_SR <- function(i = 1) {
+
+    CDUCSU_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press_New.txt")
+
+    c <- length(CDUCSU_Link_List)
+    i <- 1
+
+    CDUCSU_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press_New.txt")
+    CDUCSU_Link_List <- CDUCSU_Link_List[i]
+    URL <- CDUCSU_Link_List
+
+    CDUCSU_URL <- sub(pattern = "https://www.cducsu.de/presse/pressemitteilungen/", replacement = "", x = CDUCSU_Link_List, fixed = TRUE)
+    CDUCSU_URL <- substr(CDUCSU_URL, 1, 152)
+    Doc_Typ <- ".html"
+    CDUCSU_Lokal <- paste(CDUCSU_URL, Doc_Typ, sep = "")
+    Doc <- paste("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/CDU-CSU/", CDUCSU_Lokal, sep = "")
+
+    CDUCSU_HTML <- read_html(Doc)
+
+    CDUCSU_Titel <- html_nodes(x = CDUCSU_HTML, css = "h1")
+    Titel <- html_text(CDUCSU_Titel)
+    Titel <- paste(Titel, collapse = "")
+    if (Titel == "") {
+        Titel <- NA
+    }
+
+    CDUCSU_Rep <- html_nodes(x = CDUCSU_HTML, css = ".autor-name a")
+    CDUCSU_Rep <- html_text(CDUCSU_Rep, trim = TRUE)
+    Test_Rep <- paste(CDUCSU_Rep, collapse = "")
+    Rep <- paste(CDUCSU_Rep, collapse = ", ")
+    if (Rep == "") {
+        Rep <- NA
+    }
+    Abgeordnete_r <- Rep
+
+    CDUCSU_Date <- html_nodes(x = CDUCSU_HTML, css = "#block-ds-extras-above-title .date-display-single")
+    CDUCSU_Date <- html_attr(CDUCSU_Date, "datetype")
+    Date <- as.Date(CDUCSU_Date, "%Y-%m-%d")
+    Date <- paste(Date, collapse = "")
+    if (Date == "") {
+        Date <- NA
+    }
+    Veröffentlichungsdatum <- Date
+
+    CDUCSU_Content <- html_nodes(x = CDUCSU_HTML, css = "#block-system-main .speed-fast , #block-system-main :nth-child(7), #block-system-main :nth-child(5), .teaser, .sub-head")
+    CDUCSU_Content <- html_text(CDUCSU_Content)
+    Content <- paste(CDUCSU_Content, collapse = "")
+    Content <- gsub(pattern = '\"', '', Content)
+    Content <- gsub(pattern = "Teilen\r\n", "", Content)
+    Content <- gsub(pattern = "\r\n", "", Content)
+    Content <- gsub(pattern = "  ", "", Content)
+    Content <- gsub(pattern = "Linksrigth", "", Content, TRUE)
+    Content <- gsub(pattern = "Wird geladen ...", "", Content, TRUE)
+    Content <- gsub(pattern = Test_Rep, "", Content)
+    if (Content == "") {
+        Content <- NA
+    }
+    Inhalt <- Content
+
+    Partei <- "CDU-CSU"
+
+    CDUCSU_Data_Frame <- data.frame(Partei, Titel, Abgeordnete_r, Veröffentlichungsdatum, Inhalt, URL)
+
+    i <- i + 1
+
+    while (i <= c) {
+
+        CDUCSU_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press_New.txt")
+        CDUCSU_Link_List <- CDUCSU_Link_List[i]
+        URL <- CDUCSU_Link_List
+
+        CDUCSU_URL <- sub(pattern = "https://www.cducsu.de/presse/pressemitteilungen/", replacement = "", x = CDUCSU_Link_List, fixed = TRUE)
+        CDUCSU_URL <- substr(CDUCSU_URL, 1, 152)
+        Doc_Typ <- ".html"
+        CDUCSU_Lokal <- paste(CDUCSU_URL, Doc_Typ, sep = "")
+        Doc <- paste("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/CDU-CSU/", CDUCSU_Lokal, sep = "")
+        if (Doc == "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/CDU-CSU/weiter-gute-nachrichten-vom-arbeitsmarkt.html") {
+            i <- i + 1
+            CDUCSU_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press.txt")
+            CDUCSU_Link_List <- CDUCSU_Link_List[i]
+            URL <- CDUCSU_Link_List
+            CDUCSU_URL <- sub(pattern = "https://www.cducsu.de/presse/pressemitteilungen/", replacement = "", x = CDUCSU_Link_List, fixed = TRUE)
+            CDUCSU_URL <- substr(CDUCSU_URL, 1, 152)
+            Doc_Typ <- ".html"
+            CDUCSU_Lokal <- paste(CDUCSU_URL, Doc_Typ, sep = "")
+            Doc <- paste("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/CDU-CSU/", CDUCSU_Lokal, sep = "")
+        }
+
+        CDUCSU_HTML <- read_html(Doc)
+
+        CDUCSU_Titel <- html_nodes(x = CDUCSU_HTML, css = "h1")
+        Titel <- html_text(CDUCSU_Titel)
+        Titel <- paste(Titel, collapse = "")
+        if (Titel == "") {
+            Titel <- NA
+        }
+
+        CDUCSU_Rep <- html_nodes(x = CDUCSU_HTML, css = ".autor-name a")
+        CDUCSU_Rep <- html_text(CDUCSU_Rep, trim = TRUE)
+        Test_Rep <- paste(CDUCSU_Rep, collapse = "")
+        Rep <- paste(CDUCSU_Rep, collapse = ", ")
+        if (Rep == "") {
+            Rep <- NA
+        }
+        Abgeordnete_r <- Rep
+
+        CDUCSU_Date <- html_nodes(x = CDUCSU_HTML, css = "#block-ds-extras-above-title .date-display-single")
+        CDUCSU_Date <- html_attr(CDUCSU_Date, "datetype")
+        Date <- as.Date(CDUCSU_Date, "%Y-%m-%d")
+        Date <- paste(Date, collapse = "")
+        if (Date == "") {
+            Date <- NA
+        }
+        Veröffentlichungsdatum <- Date
+
+        CDUCSU_Content <- html_nodes(x = CDUCSU_HTML, css = "#block-system-main .speed-fast , #block-system-main :nth-child(7), #block-system-main :nth-child(5), .teaser, .sub-head")
+        CDUCSU_Content <- html_text(CDUCSU_Content)
+        CDUCSU_Content <- paste(CDUCSU_Content, collapse = "")
+        Content <- gsub(pattern = '\"', '', CDUCSU_Content)
+        Content <- gsub(pattern = "Teilen\r\n", "", Content)
+        Content <- gsub(pattern = "\r\n", "", Content)
+        Content <- gsub(pattern = "  ", "", Content)
+        Content <- gsub(pattern = "Linksrigth", "", Content, TRUE)
+        Content <- gsub(pattern = "Wird geladen ...", "", Content, TRUE)
+        Content <- gsub(pattern = Test_Rep, "", Content)
+        if (Content == "") {
+            Content <- NA
+        }
+        Inhalt <- Content
+
+        CDUCSU_New <- data.frame(Partei, Titel, Abgeordnete_r, Veröffentlichungsdatum, Inhalt, URL)
+        CDUCSU_Data_Frame <- rbind(CDUCSU_Data_Frame, CDUCSU_New)
+
+        i <- i + 1
+        if (i == 8874) {
+            i <- i + 1
+        }
+    }
+    write.table(CDUCSU_Data_Frame, "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/CDU-CSU_New.txt", row.names = FALSE, sep = "\t")
+    print("Eine Tabelle mit verschiedenen Parametern (Partei, Titel der Pressemitteilung, verfassende Abgeordnete, Veröffentlichungsdatum und Inhalt) wurde in Ihren Archiven abgelegt.")
+}
+
+CDUCSU_R <- function(i = 1) {
+
+    CDU_CSU1 <- read.table("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/CDU-CSU.txt", header = TRUE)
+    CDU_CSU2 <- read.table("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/CDU-CSU_New.txt", header = TRUE)
+    CDU_CSU <- rbind(CDU_CSU2, CDU_CSU1)
+    write.table(CDU_CSU, "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/CDU-CSU.txt", row.names = FALSE, sep = "\t")
+    file.remove("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/CDU-CSU_New.txt")
+    CDUCSU_List1 <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press.txt")
+    CDUCSU_List2 <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press_New.txt")
+    CDUCSU_List <- append(CDUCSU_List2, CDUCSU_List1)
+    sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press.txt")
+    cat(CDUCSU_List, sep = "\n")
+    sink()
+    file.remove("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press_New.txt")
+    print("Ihre CDU/CSU-Archive wurden aktualisiert")
+}
+
+
+
+GRUEN_Renewer <- function(i = 1) {
+    GRUEN_HR()
+    GRUEN_ER()
+    GRUEN_SR()
+    GRUEN_R()
+    print("Ihre Bündnis90/Die Grünen-Archive wurden vollständig aktualisiert")
+}
+
+GRUEN_HR <- function(i = 1) {
+
+    GRUEN_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press.txt")
+    GRUEN_Link_List <- GRUEN_Link_List[1]
+    GRUEN_Press_Page <- "https://www.gruene-bundestag.de/presse/pressemitteilungen.html"
+    sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press_New.txt")
+    sink()
+    GRUEN_Next_Page <- read_html(GRUEN_Press_Page)
+    GRUEN_Next_Page <- html_nodes(x = GRUEN_Next_Page, css = ".pager__button--next")
+    GRUEN_Test <- grepl(pattern = ".pager__button--next", x = GRUEN_Next_Page)
+
+    while (GRUEN_Test == TRUE) {
+        GRUEN_Press_Link <- read_html(GRUEN_Press_Page)
+        GRUEN_Press_Link <- html_nodes(x = GRUEN_Press_Link, css = ".content-teaser__blocklink")
+        GRUEN_Press_Link[!grepl(pattern = "http://", x = GRUEN_Press_Link, fixed = TRUE)]
+        GRUEN_Press_Link <- html_attr(GRUEN_Press_Link, "href")
+        GRUEN_Press_Link <- GRUEN_Press_Link[1:16]
+        GRUEN_Link <- c("https://www.gruene-bundestag.de/")
+        GRUEN_Press_Link <- paste(GRUEN_Link, GRUEN_Press_Link, sep = "")
+        GRUEN_Link_Test <- GRUEN_Link_List %in% GRUEN_Press_Link
+        GRUEN_Count <- grep(GRUEN_Link_List, GRUEN_Press_Link) - 1
+        if (GRUEN_Link_Test == TRUE) {
+            break
+        }
+
+        sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press_New.txt", append = TRUE)
+        cat(GRUEN_Press_Link, sep = "\n")
+        sink()
+        GRUEN_Next_Page <- read_html(GRUEN_Press_Page)
+        GRUEN_Next_Page <- html_nodes(x = GRUEN_Next_Page, css = ".pager__button--next")
+        GRUEN_Next_Page <- html_attr(GRUEN_Next_Page, "href")
+        GRUEN_Next_Page <- paste(GRUEN_Link, GRUEN_Next_Page, sep = "")
+        as.character(GRUEN_Next_Page)
+        GRUEN_Press_Page <- as.character(GRUEN_Next_Page)
+        GRUEN_Next_Page <- read_html(GRUEN_Press_Page)
+        GRUEN_Next_Page <- html_nodes(x = GRUEN_Next_Page, css = ".pager__button--next")
+        GRUEN_Test <- grepl(pattern = ".pager__button--next", x = GRUEN_Next_Page)
+    }
+
+    if (GRUEN_Count > 0) {
+        GRUEN_Press_Link <- read_html(GRUEN_Press_Page)
+        GRUEN_Press_Link <- html_nodes(x = GRUEN_Press_Link, css = ".content-teaser__blocklink")
+        GRUEN_Press_Link[!grepl(pattern = "http://", x = GRUEN_Press_Link, fixed = TRUE)]
+        GRUEN_Press_Link <- html_attr(GRUEN_Press_Link, "href")
+        GRUEN_Press_Link <- GRUEN_Press_Link[1:GRUEN_Count]
+        GRUEN_Press_Link <- paste(GRUEN_Link, GRUEN_Press_Link, sep = "")
+        sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press_New.txt", append = TRUE)
+        cat(GRUEN_Press_Link, sep = "\n")
+        sink()
+    }
+
+    print("Ihrem Archiv zur Verwaltung der URL-Listen wurde eine Fassung hinzugefügt, die die neuesten Bündnis90/Die Grünen-Pressemitteilungen enthält, die nicht in Ihrem Pressemitteilungsarchiv gespeichert sind.")
+}
+
+GRUEN_ER <- function(i = 1) {
+
+    GRUEN_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press_New.txt")
+    c <- length(GRUEN_Link_List)
+    i <- 1
+
+    while (i <= c) {
+        GRUEN_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press_New.txt")
+        GRUEN_Link_List <- GRUEN_Link_List[i]
+        GRUEN_URL <- sub(pattern = "https://www.gruene-bundestag.de/presse/", replacement = "", x = GRUEN_Link_List, fixed = TRUE)
+        GRUEN_URL <- gsub(pattern = "/", replacement = "-", x = GRUEN_URL, fixed = TRUE)
+        GRUEN_URL <- sub(pattern = "pressemitteilungen-", replacement = "", x = GRUEN_URL, fixed = TRUE)
+        GRUEN_URL <- sub(pattern = "pressestatements-", replacement = "", x = GRUEN_URL, fixed = TRUE)
+        GRUEN_URL <- sub(".html", "", GRUEN_URL, TRUE)
+        GRUEN_Lokal <- "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Die Grünen/"
+        GRUEN_URL <- substr(GRUEN_URL, 1, 152)
+        GRUEN_Lokal <- paste(GRUEN_Lokal, GRUEN_URL, ".html", sep = "")
+        download.file(GRUEN_Link_List, GRUEN_Lokal)
+        i <- i + 1
+    }
+
+    print("Ihrem Archiv wurden die neuesten Bündnis90/Die Grünen-Pressemitteilungen hinzugefügt")
+}
+
+GRUEN_SR <- function(i = 1) {
+
+    GRUEN_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press_New.txt")
+
+    c <- length(GRUEN_Link_List)
+    i <- 1
+
+    GRUEN_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press_New.txt")
+    GRUEN_Link_List <- GRUEN_Link_List[i]
+    URL <- GRUEN_Link_List
+
+    GRUEN_URL <- sub(pattern = "https://www.gruene-bundestag.de/presse/pressemitteilungen/", replacement = "", x = GRUEN_Link_List, fixed = TRUE)
+    GRUEN_URL <- gsub(pattern = "/", replacement = "-", x = GRUEN_URL, fixed = TRUE)
+    GRUEN_URL <- sub(pattern = "pressemitteilungen-", replacement = "", x = GRUEN_URL, fixed = TRUE)
+    GRUEN_URL <- sub(pattern = "pressestatements", replacement = "", x = GRUEN_URL, fixed = TRUE)
+    GRUEN_URL <- sub(".html", "", GRUEN_URL, TRUE)
+    GRUEN_URL <- substr(GRUEN_URL, 1, 152)
+    Doc_Typ <- ".html"
+    GRUEN_Lokal <- paste(GRUEN_URL, Doc_Typ, sep = "")
+    Doc <- paste("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Die Grünen/", GRUEN_Lokal, sep = "")
+
+    GRUEN_HTML <- read_html(Doc)
+
+    GRUEN_Titel <- html_nodes(x = GRUEN_HTML, css = ".content__title")
+    Titel <- html_text(GRUEN_Titel)
+    Titel <- paste(Titel, collapse = ", ")
+    if (Titel == "") {
+        Titel <- NA
+    }
+
+    GRUEN_Rep <- html_nodes(x = GRUEN_HTML, css = ".author__link")
+    Rep <- html_text(GRUEN_Rep)
+    Rep <- paste(Rep, collapse = ", ")
+    if (Rep == "") {
+        GRUEN_Rep <- html_nodes(x = GRUEN_HTML, css = "p:nth-child(1)")
+        Rep <- html_nodes(GRUEN_Rep, "strong")
+        Rep <- html_text(Rep)
+        Rep <- paste(Rep, collapse = ", ")
+        if (Rep == "") {
+            GRUEN_Rep <- html_nodes(x = GRUEN_HTML, css = "p.bodytext")
+            GRUEN_Rep <- GRUEN_Rep[1]
+            Rep <- html_nodes(GRUEN_Rep, "b")
+            Rep <- html_text(Rep)
+            Rep <- paste(Rep, collapse = ", ")
+            if (Rep == "") {
+                Rep <- NA
+            }
+        }
+    }
+    Abgeordnete_r <- Rep
+
+    GRUEN_Date <- html_nodes(x = GRUEN_HTML, css = ".datum")
+    Date <- html_text(GRUEN_Date)
+    Date <- gsub(".", "-", Date, fixed = TRUE)
+    Date <- as.Date(Date, "%d-%m-%Y")
+    Date <- paste(Date, collapse = "")
+    if (Date == "") {
+        Date <- NA
+    }
+    Veröffentlichungsdatum <- Date
+
+    GRUEN_Content <- html_nodes(x = GRUEN_HTML, css = "div.content__main")
+    GRUEN_Content <- html_text(GRUEN_Content)
+    GRUEN_Content <- paste(GRUEN_Content, collapse = "")
+    GRUEN_Content <- gsub("  ", "", GRUEN_Content)
+    GRUEN_Content <- gsub(" Die Fraktionspressestelle auf Twitter: ", "", GRUEN_Content, TRUE)
+    GRUEN_Content <- gsub("@GruenSprecher", "", GRUEN_Content, TRUE)
+    GRUEN_Content <- gsub("  zum Pressearchiv  ", "", GRUEN_Content, TRUE)
+    Content <- gsub("Drucken  ", "", GRUEN_Content, TRUE)
+    Content <- gsub(pattern = '\"', '', Content)
+    if (Content == "") {
+        Content <- NA
+    }
+    Inhalt <- Content
+
+    Partei <- "Die Grünen"
+
+    GRUEN_Data_Frame <- data.frame(Partei, Titel, Abgeordnete_r, Veröffentlichungsdatum, Inhalt, URL)
+
+    i <- i + 1
+
+    while (i <= c) {
+
+        GRUEN_Link_List <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press_New.txt")
+        GRUEN_Link_List <- GRUEN_Link_List[i]
+        URL <- GRUEN_Link_List
+
+        GRUEN_URL <- sub(pattern = "https://www.gruene-bundestag.de/presse/", replacement = "", x = GRUEN_Link_List, fixed = TRUE)
+        GRUEN_URL <- gsub(pattern = "/", replacement = "-", x = GRUEN_URL, fixed = TRUE)
+        GRUEN_URL <- sub(pattern = "pressemitteilungen-", replacement = "", x = GRUEN_URL, fixed = TRUE)
+        GRUEN_URL <- sub(pattern = "pressestatements-", replacement = "", x = GRUEN_URL, fixed = TRUE)
+        GRUEN_URL <- sub(".html", "", GRUEN_URL, TRUE)
+        GRUEN_URL <- substr(GRUEN_URL, 1, 152)
+        Doc_Typ <- ".html"
+        GRUEN_Lokal <- paste(GRUEN_URL, Doc_Typ, sep = "")
+        Doc <- paste("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Die Grünen/", GRUEN_Lokal, sep = "")
+
+        GRUEN_HTML <- read_html(Doc)
+
+        GRUEN_Titel <- html_nodes(x = GRUEN_HTML, css = ".content__title")
+        Titel <- html_text(GRUEN_Titel)
+        Titel <- paste(Titel, collapse = ", ")
+        if (Titel == "") {
+            Titel <- NA
+        }
+
+        GRUEN_Rep <- html_nodes(x = GRUEN_HTML, css = ".author__link")
+        Rep <- html_text(GRUEN_Rep)
+        Rep <- paste(Rep, collapse = ", ")
+        if (Rep == "") {
+            GRUEN_Rep <- html_nodes(x = GRUEN_HTML, css = "p:nth-child(1)")
+            Rep <- html_nodes(GRUEN_Rep, "strong")
+            Rep <- html_text(Rep)
+            Rep <- paste(Rep, collapse = ", ")
+            if (Rep == "") {
+                GRUEN_Rep <- html_nodes(x = GRUEN_HTML, css = "p.bodytext")
+                GRUEN_Rep <- GRUEN_Rep[1]
+                Rep <- html_nodes(GRUEN_Rep, "b")
+                Rep <- html_text(Rep)
+                Rep <- paste(Rep, collapse = ", ")
+                if (Rep == "") {
+                    Rep <- NA
+                }
+            }
+        }
+        Abgeordnete_r <- Rep
+
+        GRUEN_Date <- html_nodes(x = GRUEN_HTML, css = ".datum")
+        Date <- html_text(GRUEN_Date)
+        Date <- gsub(".", "-", Date, fixed = TRUE)
+        Date <- as.Date(Date, "%d-%m-%Y")
+        Date <- paste(Date, collapse = "")
+        if (Date == "") {
+            Date <- NA
+        }
+        Veröffentlichungsdatum <- Date
+
+        GRUEN_Content <- html_nodes(x = GRUEN_HTML, css = "div.content__main")
+        GRUEN_Content <- html_text(GRUEN_Content)
+        GRUEN_Content <- paste(GRUEN_Content, collapse = "")
+        GRUEN_Content <- gsub("  ", "", GRUEN_Content)
+        GRUEN_Content <- gsub(" Die Fraktionspressestelle auf Twitter: ", "", GRUEN_Content, TRUE)
+        GRUEN_Content <- gsub("@GruenSprecher", "", GRUEN_Content, TRUE)
+        GRUEN_Content <- gsub("  zum Pressearchiv  ", "", GRUEN_Content, TRUE)
+        Content <- gsub("Drucken  ", "", GRUEN_Content, TRUE)
+        Content <- gsub(pattern = '\"', '', Content)
+        if (Content == "") {
+            Content <- NA
+        }
+        Inhalt <- Content
+
+        GRUEN_New <- data.frame(Partei, Titel, Abgeordnete_r, Veröffentlichungsdatum, Inhalt, URL)
+        GRUEN_Data_Frame <- rbind(GRUEN_Data_Frame, GRUEN_New)
+
+        i <- i + 1
+    }
+    write.table(GRUEN_Data_Frame, "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/Die Grünen_New.txt", row.names = FALSE, sep = "\t")
+    print("Eine Tabelle mit verschiedenen Parametern (Partei, Titel der Pressemitteilung, verfassende Abgeordnete, Veröffentlichungsdatum und Inhalt) wurde in Ihren Archiven abgelegt.")
+}
+
+GRUEN_R <- function(i = 1) {
+
+    Die_Gruenen1 <- read.table("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/Die Grünen.txt", header = TRUE)
+    Die_Gruenen2 <- read.table("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/Die Grünen_New.txt", header = TRUE)
+    Die_Gruenen <- rbind(Die_Gruenen2, Die_Gruenen1)
+    write.table(Die_Gruenen, "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/Die Grünen.txt", row.names = FALSE, sep = "\t")
+    file.remove("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Silo/Tabellen/Die Grünen_New.txt")
+    GRUEN_List1 <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press.txt")
+    GRUEN_List2 <- readLines("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press_New.txt")
+    GRUEN_List <- append(GRUEN_List2, GRUEN_List1)
+    sink("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press.txt")
+    cat(GRUEN_List, sep = "\n")
+    sink()
+    file.remove("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press_New.txt")
+    print("Ihre Bündnis90/Die Grünen-Archive wurden aktualisiert")
+}
