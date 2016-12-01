@@ -1,0 +1,331 @@
+---
+title: "Harvester"
+author: Manuel Thiemann
+date: 14.10.2016
+output: html_document
+Version: 1.0
+---
+
+```{r}
+setwd("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Working Directory")
+```
+```{r}
+
+ls()
+rm(list=ls(all=TRUE))
+```
+__________________________
+_Partei__Press__Harvester_
+__________________________
+
+```{r}
+install.packages ("XML")
+install.packages ("xml2")
+install.packages ("rvest")
+install.packages ("pdftools")
+
+library (XML)
+library (xml2)
+library (rvest)
+library (pdftools)
+```
+________________
+_SPD__Harvester_ 
+________________
+
+```{r}
+
+SPD_Press_Page <- "http://www.spdfraktion.de/presse/pressemitteilungen"
+
+sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press.txt", append = TRUE)
+sink ()
+
+SPD_Next_Page <- read_html (SPD_Press_Page)
+SPD_Next_Page <- html_nodes (x = SPD_Next_Page, css = "li.pager-next.next.last")
+SPD_Test <- grepl(pattern = "pager-next next last", x = SPD_Next_Page)
+
+while (SPD_Test == TRUE) {
+
+	SPD_Press_Link <- read_html (SPD_Press_Page)
+	SPD_Press_Link <- html_nodes (x = SPD_Press_Link, css = ".node-pressemitteilung a")
+	SPD_Press_Link [!grepl (pattern = "http://", x = SPD_Press_Link, fixed = TRUE)]
+	SPD_Press_Link <- html_attr (SPD_Press_Link, "href")
+	SPD_Link <- c ("http://www.spdfraktion.de")
+	SPD_Press_Link <- paste (SPD_Link, SPD_Press_Link, sep = "")
+
+	sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press.txt", append = TRUE)
+	cat (SPD_Press_Link, sep = "\n")
+	sink ()
+
+	SPD_Next_Page <- read_html (SPD_Press_Page)
+	SPD_Next_Page <- html_nodes (x = SPD_Next_Page, css = "#block-system-main .last a")
+	SPD_Next_Page <- html_attr (SPD_Next_Page, "href")
+	SPD_Next_Page <- SPD_Next_Page [1]
+	SPD_Next_Page <- paste (SPD_Link, SPD_Next_Page, sep ="")
+	as.character (SPD_Next_Page)
+	SPD_Press_Page <- as.character (SPD_Next_Page)
+	
+	SPD_Next_Page <- read_html (SPD_Press_Page)
+	SPD_Next_Page <- html_nodes (x = SPD_Next_Page, css = "li.pager-next.next.last")
+	SPD_Test <- grepl(pattern = "pager-next next last", x = SPD_Next_Page)
+}
+
+# SPD_Press_Link <- read_html (SPD_Press_Page)
+# SPD_Press_Link <- html_nodes (x = SPD_Press_Link, css = ".node-pressemitteilung a")
+# SPD_Press_Link [!grepl (pattern = "http://", x = SPD_Press_Link, fixed = TRUE)]
+# SPD_Press_Link <- html_attr (SPD_Press_Link, "href")
+# SPD_Press_Link <- paste (SPD_Link, SPD_Press_Link, sep = "")
+
+# sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press.txt", append = TRUE)
+# cat (SPD_Press_Link, sep = "\n")
+# sink ()
+
+```
+__________________________________
+_Bündnis90/Die Grünen__Harvester_	
+__________________________________
+
+```{r}
+
+GRUEN_Press_Page <- "https://www.gruene-bundestag.de/presse/pressemitteilungen.html"
+
+sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press.txt", append = TRUE)
+sink ()
+
+GRUEN_Next_Page <- read_html (GRUEN_Press_Page)
+GRUEN_Next_Page <- html_nodes (x = GRUEN_Next_Page, css = ".pager__button--next")
+GRUEN_Test <- grepl(pattern = ".pager__button--next", x = GRUEN_Next_Page)
+
+while (GRUEN_Test == TRUE) {
+
+	GRUEN_Press_Link <- read_html (GRUEN_Press_Page)
+	GRUEN_Press_Link <- html_nodes (x = GRUEN_Press_Link, css = ".content-teaser__blocklink")
+	GRUE_Press_Link [!grepl (pattern = "http://", x = GRUEN_Press_Link, fixed = TRUE)]
+	GRUEN_Press_Link <- html_attr (GRUEN_Press_Link, "href")
+	GRUEN_Press_Link <- GRUEN_Press_Link [1:16]
+	GRUEN_Link <- c ("https://www.gruene-bundestag.de/")
+	GRUEN_Press_Link <- paste (GRUEN_Link, GRUEN_Press_Link, sep = "")
+
+	sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press.txt", append = TRUE)
+	cat (GRUEN_Press_Link, sep = "\n")
+	sink ()
+
+	GRUEN_Next_Page <- read_html (GRUEN_Press_Page)
+	GRUEN_Next_Page <- html_nodes (x = GRUEN_Next_Page, css = ".pager__button--next")
+	GRUEN_Next_Page <- html_attr (GRUEN_Next_Page, "href")
+	GRUEN_Next_Page <- paste (GRUEN_Link, GRUEN_Next_Page, sep ="")
+	as.character (GRUEN_Next_Page)
+	GRUEN_Press_Page <- as.character (GRUEN_Next_Page)
+
+	GRUEN_Next_Page <- read_html (GRUEN_Press_Page)
+	GRUEN_Next_Page <- html_nodes (x = GRUEN_Next_Page, css = ".pager__button--next")
+	GRUEN_Test <- grepl(pattern = ".pager__button--next", x = GRUEN_Next_Page)
+}
+
+GRUEN_Press_Link <- read_html (GRUEN_Press_Page)
+GRUEN_Press_Link <- html_nodes (x = GRUEN_Press_Link, css = ".content-teaser__blocklink")
+GRUEN_Press_Link [!grepl (pattern = "http://", x = GRUEN_Press_Link, fixed = TRUE)]
+GRUEN_Press_Link <- html_attr (GRUEN_Press_Link, "href")
+GRUEN_Press_Link <- GRUEN_Press_Link [1:16]
+GRUEN_Press_Link <- paste (GRUEN_Link, GRUEN_Press_Link, sep = "")
+
+sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press.txt", append = TRUE)
+cat (GRUEN_Press_Link, sep = "\n")
+sink ()
+
+```
+____________________
+_CDU/CSU__Harvester_
+____________________
+```{r}
+
+CDUCSU_Press_Page <- "https://www.cducsu.de/presse/pressemitteilungen?title=&term_node_tid_depth_1=All&term_node_tid_depth_2=All&field_datum_value[min]&field_datum_value[max]&term_node_tid_depth_3=157&page=1"
+CDUCSU_Page <- 1
+
+sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press.txt", append = TRUE)
+sink ()
+
+CDUCSU_Next_Page <- read_html (CDUCSU_Press_Page)
+CDUCSU_Next_Page <- html_nodes (x = CDUCSU_Next_Page, css = "li.pager-next.first.last")
+CDUCSU_Test <- grepl(pattern = "pager-next first last", x = CDUCSU_Next_Page)
+
+while (CDUCSU_Test == TRUE) {
+
+	CDUCSU_Press_Link <- read_html (CDUCSU_Press_Page)
+	CDUCSU_Press_Link <- html_nodes (x = CDUCSU_Press_Link, css = "#view-display-id-page_5 h2 a")
+	CDUCSU_Press_Link [!grepl (pattern = "http://", x = CDUCSU_Press_Link, fixed = TRUE)]
+	CDUCSU_Press_Link <- html_attr (CDUCSU_Press_Link, "href")
+	CDUCSU_Link <- c ("https://www.cducsu.de")
+	as.data.frame (CDUCSU_Link)
+	CDUCSU_Press_Link <- paste (CDUCSU_Link, CDUCSU_Press_Link, sep = "")
+
+	sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press.txt", append = TRUE)
+	cat (CDUCSU_Press_Link, sep = "\n")
+	sink ()
+
+	CDUCSU_Page <- CDUCSU_Page +1
+	CDUCSU_Next_Page_first <- "https://www.cducsu.de/presse/pressemitteilungen?title=&term_node_tid_depth_1=All&term_node_tid_depth_2=All&field_datum_value[min]&field_datum_value[max]&term_node_tid_depth_3=157&page="
+	CDUCSU_Next_Page <- paste (CDUCSU_Next_Page_first, CDUCSU_Page, sep = "")
+	as.character (CDUCSU_Next_Page)
+	CDUCSU_Press_Page <- as.character (CDUCSU_Next_Page)
+
+	CDUCSU_Next_Page <- read_html (CDUCSU_Press_Page)
+	CDUCSU_Next_Page <- html_nodes (x = CDUCSU_Next_Page, css = "li.pager-next.first.last")
+	CDUCSU_Test <- grepl(pattern = "href", x = CDUCSU_Next_Page)
+}
+
+CDUCSU_Press_Link <- read_html (CDUCSU_Press_Page)
+CDUCSU_Press_Link <- html_nodes (x = CDUCSU_Press_Link, css = "#view-display-id-page_5 h2 a")
+CDUCSU_Press_Link [!grepl (pattern = "http://", x = CDUCSU_Press_Link, fixed = TRUE)]
+CDUCSU_Press_Link <- html_attr (CDUCSU_Press_Link, "href")
+CDUCSU_Link <- c ("https://www.cducsu.de")
+CDUCSU_Press_Link <- paste (CDUCSU_Link, CDUCSU_Press_Link, sep = "")
+
+sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press.txt", append = TRUE)
+cat (CDUCSU_Press_Link, sep = "\n")
+sink ()
+
+```
+______________________
+_Die Linke__Harvester_
+______________________
+```{r}
+
+LINKE_Press_Page <- "https://www.linksfraktion.de/presse/pressemitteilungen/?tx_news_pi1%5B%40widget_0%5D%5BcurrentPage%5D=1&cHash=193b7770118723ac6942c5c3c7b492e1"
+LINKE_Page <- 1
+
+sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press.txt", append = TRUE)
+sink ()
+
+LINKE_Next_Page <- read_html (LINKE_Press_Page)
+LINKE_Next_Page <- html_nodes (x = LINKE_Next_Page, css = "li.last.next")
+LINKE_Test <- grepl(pattern = "last next", x = LINKE_Next_Page)
+
+while (LINKE_Test == TRUE) {
+
+	LINKE_Press_Link <- read_html (LINKE_Press_Page)
+	LINKE_Press_Link <- html_nodes (x = LINKE_Press_Link, css = ".more")
+	LINKE_Press_Link [!grepl (pattern = "http://", x = LINKE_Press_Link, fixed = TRUE)]
+	LINKE_Press_Link <- html_attr (LINKE_Press_Link, "href")
+	LINKE_Link <- c ("https://www.linksfraktion.de") 
+	as.data.frame (LINKE_Link)
+	LINKE_Press_Link <- paste (LINKE_Link, LINKE_Press_Link, sep = "")
+
+	sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press.txt", append = TRUE)
+	cat (LINKE_Press_Link, sep = "\n")
+	sink ()
+
+	LINKE_Page <- LINKE_Page +1
+	LINKE_Next_Page_first <- "https://www.linksfraktion.de/presse/pressemitteilungen/?tx_news_pi1%5B%40widget_0%5D%5BcurrentPage%5D="
+	LINKE_Next_Page_last <- "&cHash=193b7770118723ac6942c5c3c7b492e1"
+	LINKE_Next_Page <- paste (LINKE_Next_Page_first, LINKE_Page, LINKE_Next_Page_last, sep = "")
+	as.character (LINKE_Next_Page)
+	LINKE_Press_Page <- as.character (LINKE_Next_Page)
+
+	LINKE_Next_Page <- read_html (LINKE_Press_Page)
+	LINKE_Next_Page <- html_nodes (x = LINKE_Next_Page, css = "li.last.next")
+	LINKE_Test <- grepl(pattern = "last next", x = LINKE_Next_Page)
+}
+
+LINKE_Press_Link <- read_html (LINKE_Press_Page)
+LINKE_Press_Link <- html_nodes (x = LINKE_Press_Link, css = ".more")
+LINKE_Press_Link [!grepl (pattern = "http://", x = LINKE_Press_Link, fixed = TRUE)]
+LINKE_Press_Link <- html_attr (LINKE_Press_Link, "href")
+LINKE_Press_Link <- paste (LINKE_Link, LINKE_Press_Link, sep = "")
+
+sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press.txt", append = TRUE)
+cat (LINKE_Press_Link, sep = "\n")
+sink ()
+
+```
+__________________________________
+_Bundestags Protokolle__Harvester_
+__________________________________
+```{r}
+
+BT_URL_First <- "http://dipbt.bundestag.de/dip21/btp/"
+BT_URL_Last <- ".pdf"
+
+BT_Doc_Nr <- 1
+BT_Period <- 16
+
+while (BT_Doc_Nr <= 233){
+
+	if (BT_Doc_Nr < 100){
+		as.character (BT_Doc_Nr)
+		BT_Doc_Nr_end <- paste ("0", BT_Doc_Nr, sep = "")
+		if (BT_Doc_Nr < 10){
+			as.character (BT_Doc_Nr)
+			BT_Doc_Nr_end <- paste ("0", "0", BT_Doc_Nr, sep = "")
+		}
+	}
+	else {
+		BT_Doc_Nr_end <- BT_Doc_Nr
+	}
+	BT_URL <- paste (BT_URL_First, BT_Period, "/", BT_Period, BT_Doc_Nr_end, sep = "")
+	# BT_PDF <- paste ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/URL Listen/Protokolle/", BT_Period, BT_Doc_Nr_end, BT_URL_Last, sep = "")
+	# download.file (BT_URL, BT_PDF, mode = "wb")
+
+	sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Protokoll_List.txt", append = TRUE)
+	cat (BT_URL, sep = "\n")
+	sink ()
+
+	BT_Doc_Nr <- BT_Doc_Nr + 1
+}
+
+BT_Doc_Nr <- 1
+BT_Period <- BT_Period + 1
+
+while (BT_Doc_Nr <= 253){
+
+	if (BT_Doc_Nr < 100){
+		as.character (BT_Doc_Nr)
+		BT_Doc_Nr_end <- paste ("0", BT_Doc_Nr, sep = "")
+		if (BT_Doc_Nr < 10){
+			as.character (BT_Doc_Nr)
+			BT_Doc_Nr_end <- paste ("0", "0", BT_Doc_Nr, sep = "")
+		}
+	}
+	else {
+		BT_Doc_Nr_end <- BT_Doc_Nr
+	}
+	BT_Doc_Nr_end
+	BT_URL <- paste (BT_URL_First, BT_Period, "/", BT_Period, BT_Doc_Nr_end, sep = "")
+	# BT_PDF <- paste ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Protokolle/", BT_Period, BT_Doc_Nr_end, BT_URL_Last, sep = "")
+	# download.file (BT_URL, BT_PDF, mode = "wb")
+
+	sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Protokoll_List.txt", append = TRUE)
+	cat (BT_URL, sep = "\n")
+	sink ()
+
+	BT_Doc_Nr <- BT_Doc_Nr + 1
+}
+
+BT_Doc_Nr <- 1
+BT_Period <- BT_Period + 1
+
+while (BT_Doc_Nr <= 197){
+	
+	if (BT_Doc_Nr < 100){
+		as.character (BT_Doc_Nr)
+		BT_Doc_Nr_end <- paste ("0", BT_Doc_Nr, sep = "")
+		if (BT_Doc_Nr < 10){
+			as.character (BT_Doc_Nr)
+			BT_Doc_Nr_end <- paste ("0", "0", BT_Doc_Nr, sep = "")
+		}
+	}
+	else {
+		BT_Doc_Nr_end <- BT_Doc_Nr
+	}
+	BT_Doc_Nr_end
+	BT_URL <- paste (BT_URL_First, BT_Period, "/", BT_Period, BT_Doc_Nr_end, sep = "")
+	# BT_PDF <- paste ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Protokolle/", BT_Period, BT_Doc_Nr_end, BT_URL_Last, sep = "")
+	# download.file (BT_URL, BT_PDF, mode = "wb")
+
+	sink ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Protokoll_List.txt", append = TRUE)
+	cat (BT_URL, sep = "\n")
+	sink ()
+
+	BT_Doc_Nr <- BT_Doc_Nr + 1
+}
+```

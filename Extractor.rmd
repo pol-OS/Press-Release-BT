@@ -1,0 +1,167 @@
+---
+title: "Extractor"
+author: Manuel Thiemann
+date: 17.10.2016
+output: html_document
+Version: 1
+---
+
+```{r}
+setwd ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Working Directory")
+```
+```{r}
+
+ls()
+rm(list=ls(all=TRUE))
+```
+__________________________
+_Partei__Press__Extractor_
+__________________________
+
+```{r}
+install.packages ("XML")
+install.packages ("xml2")
+install.packages ("rvest")
+install.packages ("stringr")
+
+library (XML)
+library (xml2)
+library (rvest)
+library (stringr)
+```
+________________
+_SPD__Extractor_
+________________
+```{r}
+SPD_Link_List <- readLines ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press.txt")
+
+c <- length (SPD_Link_List)
+i <- 1
+
+while (i <= c){
+
+	SPD_Link_List <- readLines ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/SPD_Press.txt")
+	SPD_Link_List <- SPD_Link_List [i]
+
+	SPD_URL <- sub (pattern = "http://www.spdfraktion.de/presse/pressemitteilungen/", replacement = "", x = SPD_Link_List, fixed = TRUE)
+	SPD_Lokal <- "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/SPD/"
+	SPD_URL <- substr (SPD_URL, 1, 152)
+	Doc_Typ <- ".html"
+	SPD_Lokal <- paste (SPD_Lokal, SPD_URL, Doc_Typ, sep = "")
+
+	download.file (SPD_Link_List, SPD_Lokal)
+
+	i <- i+1
+}
+```
+__________________________________
+_Bündnis90/Die Grünen__Extractor_
+__________________________________
+```{r}
+GRUEN_Link_List <- readLines ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press.txt")
+
+c <- length (GRUEN_Link_List)
+i <- 1
+
+while (i <= c){
+
+	GRUEN_Link_List <- readLines ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/GRUEN_Press.txt")
+	GRUEN_Link_List <- GRUEN_Link_List [i]
+
+	GRUEN_URL <- sub (pattern = "https://www.gruene-bundestag.de/presse/", replacement = "", x = GRUEN_Link_List, fixed = TRUE)
+	GRUEN_URL <- gsub (pattern = "/", replacement = "-", x = GRUEN_URL, fixed = TRUE)
+	GRUEN_URL <- sub (pattern = "pressemitteilungen-", replacement = "", x = GRUEN_URL, fixed = TRUE)
+	GRUEN_URL <- sub (pattern = "pressestatements-", replacement = "", x = GRUEN_URL, fixed = TRUE)
+	GRUEN_URL <- sub (".html", "", GRUEN_URL, TRUE)
+	GRUEN_Lokal <- "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Die Grünen/"
+	GRUEN_URL <- substr (GRUEN_URL, 1, 152)
+	GRUEN_Lokal <- paste (GRUEN_Lokal, GRUEN_URL, ".html", sep = "")
+
+	download.file (GRUEN_Link_List, GRUEN_Lokal)
+
+	i <- i+1
+}
+```
+____________________
+_CDU/CSU__Extractor_
+____________________
+```{r}
+CDUCSU_Link_List <- readLines ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press.txt")
+
+c <- length (CDUCSU_Link_List)
+i <- 6163
+# Aufpassen!!! Pressemitteilung 8804 erzeugt einen 404
+
+while (i <= c){
+
+	CDUCSU_Link_List <- readLines ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/CDU-CSU_Press.txt")
+	CDUCSU_Link_List <- CDUCSU_Link_List [i]
+
+	CDUCSU_URL <- sub (pattern = "https://www.cducsu.de/presse/pressemitteilungen/", replacement = "", x = CDUCSU_Link_List, fixed = TRUE)
+	CDUCSU_Lokal <- "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/CDU-CSU/"
+	CDUCSU_URL <- substr (CDUCSU_URL, 1, 152)
+	Doc_Typ <- ".html"
+	CDUCSU_Lokal <- paste (CDUCSU_Lokal, CDUCSU_URL, Doc_Typ, sep = "")
+
+	download.file (CDUCSU_Link_List, CDUCSU_Lokal)
+
+	i <- i+1
+	if (i == 8804){
+		i <- i+1
+	}
+}
+```
+______________________
+_Die Linke__Extractor_
+______________________
+```{r}
+LINKE_Link_List <- readLines ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press.txt")
+
+c <- length (LINKE_Link_List)
+i <- 1
+
+while (i <= c){
+
+	LINKE_Link_List <- readLines ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Die-Linke_Press.txt")
+	LINKE_Link_List <- LINKE_Link_List [i]
+
+	LINKE_URL <- sub (pattern = "https://www.linksfraktion.de/presse/pressemitteilungen/", replacement = "", x = LINKE_Link_List, fixed = TRUE)
+	LINKE_URL <- gsub (pattern = "/", replacement = "", x = LINKE_URL, fixed = TRUE)
+	LINKE_URL <- gsub (pattern = "detail", replacement = "", x = LINKE_URL, fixed = TRUE)
+	LINKE_Lokal <- "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Die Linke/"
+	LINKE_URL <- substr (LINKE_URL, 1, 152)
+	#Doc_Typ <- ".html"
+	LINKE_Lokal <- paste (LINKE_Lokal, LINKE_URL, Doc_Typ, sep = "")
+
+	download.file (LINKE_Link_List, LINKE_Lokal, method = "auto")
+
+	i <- i+1
+}
+```
+__________________________________
+_Bundestags Protokolle__Extractor_
+__________________________________
+```{r}
+BT_Link_List <- readLines ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Protokoll_List.txt")
+
+c <- length (BT_Link_List)
+i <- 1
+
+while (i <= c){
+
+	BT_Link_List <- readLines ("C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Harvester/URL Listen/Protokoll_List.txt")
+	BT_Link_List <- BT_Link_List [i]
+
+	BT_URL <- sub (pattern = "http://dipbt.bundestag.de/dip21/btp/", replacement = "", x = BT_Link_List, fixed = TRUE)
+	BT_URL <- gsub (pattern = "16/", replacement = "", x = BT_URL, fixed = TRUE)
+	BT_URL <- gsub (pattern = "17/", replacement = "", x = BT_URL, fixed = TRUE)
+	BT_URL <- gsub (pattern = "18/", replacement = "", x = BT_URL, fixed = TRUE)
+	BT_Lokal <- "C:/Users/manue/Uni/Politikmanagement MA/Masterarbeit/Programmierung/Extractor/Ausgabe/Protokolle/"
+	Doc_Typ <- ".pdf"
+	BT_Lokal <- paste (BT_Lokal, BT_URL, Doc_Typ, sep = "")
+
+	download.file (BT_Link_List, BT_Lokal)
+
+	i <- i+1
+}
+```
